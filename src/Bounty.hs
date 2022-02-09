@@ -46,16 +46,16 @@ import           Ledger.Ada             as Ada
 import           Ledger.Constraints     as Constraints
 import           Ledger.Index           as Index
 import qualified Ledger.Typed.Scripts   as Scripts
-import qualified Ledger.Contexts                   as Validation
+import qualified Ledger.Contexts        as Validation
 import           Ledger.Value           as Value
 import           Playground.Contract    (printJson, printSchemas, ensureKnownCurrencies, stage, ToSchema, NonEmpty(..) )
 import           Playground.TH          (mkKnownCurrencies, mkSchemaDefinitions, ensureKnownCurrencies)
 import           Playground.Types       (KnownCurrency (..))
 import           Prelude                (Semigroup (..))
 import           Text.Printf            (printf)
-import           GHC.Generics         (Generic)
-import           Data.String          (IsString (..))
-import           Data.Aeson           (ToJSON, FromJSON)
+import           GHC.Generics           (Generic)
+import           Data.String            (IsString (..))
+import           Data.Aeson             (ToJSON, FromJSON)
 import           Data.List              (union, intersect)
 
 data Bounty = Bounty
@@ -63,7 +63,7 @@ data Bounty = Bounty
     , voters               :: ![PubKeyHash]
     , requiredVotes        :: !Integer
     , collectionMakerClass :: !AssetClass
-    , collectionToken :: !AssetClass
+    , collectionToken      :: !AssetClass
     } deriving (Show, Generic, FromJSON, ToJSON)
 
 PlutusTx.makeIsDataIndexed ''Bounty [ ('Bounty, 0) ]
@@ -131,8 +131,8 @@ potDatum txInfo o = do
     Datum d <- findDatum dh txInfo
     PlutusTx.fromBuiltinData d
 
-
 -- Asset Related Functions
+
 {-# INLINABLE collectionMinted #-}
 collectionMinted :: ScriptContext -> AssetClass -> Integer
 collectionMinted ctx collectionAsset =
@@ -226,27 +226,23 @@ getOutputPDatum info txOuts = case [o | o <- txOuts, containsPot info o] of
 {-# INLINABLE startCollectionDatum #-}
 startCollectionDatum :: Maybe BountyDatum -> Bool
 startCollectionDatum md = case md of
-  Just (CollectionDatum c) ->
-    length (votes c) == 0
+  Just (CollectionDatum c) -> length (votes c) == 0
   _                        -> False
 
 {-# INLINABLE validMakerDatum #-}
 validMakerDatum :: Maybe BountyDatum -> Bool
 validMakerDatum md = case md of
-  Just CollectionMaker ->
-    True
-  _                        -> False
+  Just CollectionMaker -> True
+  _                    -> False
 
 {-# INLINABLE validPotDatum #-}
 validPotDatum :: Maybe BountyDatum -> Bool
 validPotDatum md = case md of
-  Just PotDatum ->
-    True
-  _                        -> False
+  Just PotDatum -> True
+  _             -> False
 
 -- - Collection maker class come and go
 -- - CollectionDatum value starts with an empty voter list.
--- - 
 {-# INLINABLE checkCreateCollection #-}
 checkCreateCollection :: ScriptContext -> BountyDatum -> AssetClass -> AssetClass -> Bool
 checkCreateCollection ctx collection makerAsset collectionAsset =
@@ -277,9 +273,9 @@ checkVoteApplication ctx collectionAsset datum voters =
     assetContinues ctx continuingOutputs collectionAsset &&
     validateCollectionChange txInfo voters datum datumBox
 
--- - Are there enough voters in the list 
+-- - Are there enough voters in the list
 -- - There's only one collectionAsset present as input and it is attached to a valid datum value for usage.
--- - The value attached to the PotDatum is sent to the 
+-- - The value attached to the PotDatum is sent to the
 {-# INLINABLE checkSpending #-}
 checkSpending :: ScriptContext -> Bounty -> Bool
 checkSpending ctx bounty =
@@ -296,8 +292,6 @@ checkSpending ctx bounty =
     validateUseOfPot bounty potTxOut potBox datumBox
 
 -- We only can have one CollectionDatum/Token - We need to implement these - definitely.
--- We only can have one 
-
 {-# INLINABLE bountyScript #-}
 bountyScript :: Bounty -> BountyDatum -> BountyAction -> ScriptContext -> Bool
 bountyScript bounty datum action ctx = case datum of

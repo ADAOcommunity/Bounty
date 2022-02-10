@@ -28,6 +28,8 @@
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
+-- TODO: describe the contract like the examples in plutus-apps
+
 module Bounty where
 
 import           Prelude                (String, show, Show)
